@@ -1,7 +1,7 @@
-from crypt import methods
-from flask import Flask, render_template, request, url_for
+from flask import Flask, render_template, request, url_for, flash
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "fdslkfjdsfkjeuf823492h8fndsjfjhs"
 
 menu = [
     {"name": "Установка", "url": "install-flask"},
@@ -25,7 +25,11 @@ def about():
 @app.route("/contact", methods=["POST", "GET"])
 def contact():
     if request.method == "POST":
-        print(request.form)
+        if len(request.form["username"]) > 2:
+            flash("Сообщение отправлено", category="success")
+        else:
+            flash("Ошибка отправки", category="error")
+
     return render_template("contact.html", title="Обратная связь", menu=menu)
 
 
