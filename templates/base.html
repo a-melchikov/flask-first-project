@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% block title -%}
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="keywords" content="Flask, веб-разработка, Python" />
+            <meta name="description" content="Узнайте больше о Flask." />
+            {% if title %}
+                <title>Про Flask - {{ title }}</title>
+            {% else %}
+                <title>Про Flask</title>
+            {% endif %}
+        {% endblock title %}
+    </head>
+    <body>
+        {% block content -%}
+            {%- block mainmenu -%}
+                <ul>
+                    {% for m in menu -%}
+                        <li>{{ m }}</li>
+                    {% endfor -%}
+                </ul>
+            {% endblock mainmenu -%}
+            {% if title -%}
+                <h1>{{ title }}</h1>
+            {% else -%}
+                <h1>Про Flask</h1>
+            {% endif -%}
+        {% endblock content -%}
+    </body>
+</html>
