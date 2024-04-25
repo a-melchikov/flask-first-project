@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, flash
+from flask import Flask, redirect, render_template, request, session, url_for, flash, abort
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "fdslkfjdsfkjeuf823492h8fndsjfjhs"
@@ -31,6 +31,32 @@ def contact():
             flash("Ошибка отправки", category="error")
 
     return render_template("contact.html", title="Обратная связь", menu=menu)
+
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    if "userLogged" in session:
+        return redirect(url_for("profile", username=session["userLogged"]))
+    elif (
+        request.method == "POST"
+        and request.form["username"] == "andrey"
+        and request.form["psw"] == "123"
+    ):
+        session["userLogged"] = request.form["username"]
+        return redirect(url_for("profile", username=session["userLogged"]))
+    return render_template("login.html", title="Авторизация", menu=menu)
+
+
+@app.route("/profile/<username>")
+def profile(username):
+    if "userLogged" not in session or session["userLogged"] != username:
+        abort(401)
+    return f"Профиль пользователя: {username}"
+
+
+@app.errorhandler(404)
+def pageNotFound(error):
+    return render_template("page404.html", title="Страница не найдена", menu=menu), 404
 
 
 # with app.test_request_context():
