@@ -1,5 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
     {{ super() }}
-    {{ post }}
+    {{ post|safe }}
 {% endblock content %}
