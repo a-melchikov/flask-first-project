@@ -1,3 +1,4 @@
+import datetime
 import sqlite3
 import os
 from flask import (
@@ -8,16 +9,18 @@ from flask import (
     make_response,
     render_template,
     request,
+    session,
 )
 from FDataBase import FDataBase
 
 # Конфигурация
 DATABASE = "/home/andrey/code/flask-projects/flask-first-project/data.db"
 DEBUG = True
-SECRET_KEY = "fdslkfjdsfkjeuf><FSDJ@#!#!@823492h8fndsjfjhs"
+SECRET_KEY = "b1670b8fc8f5c511a53e5c4363f733f9419802e2"
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+app.permanent_session_lifetime = datetime.timedelta(days=10)
 
 app.config.update(dict(DATABASE=os.path.join(app.root_path, "data.db")))
 
@@ -48,13 +51,36 @@ def close_db(error):
         g.link_db.close()
 
 
+# @app.route("/")
+# def index():
+#     db = get_db()
+#     dbase = FDataBase(db)
+#     return render_template(
+#         "index.html", menu=dbase.getMenu(), posts=dbase.getPostsAnonce()
+#     )
+
+
 @app.route("/")
 def index():
-    db = get_db()
-    dbase = FDataBase(db)
-    return render_template(
-        "index.html", menu=dbase.getMenu(), posts=dbase.getPostsAnonce()
-    )
+    if "visits" in session:
+        session["visits"] = session.get("visits") + 1
+    else:
+        session["visits"] = 1
+    return f"<h1>Main Page</h1><p>Число просмотров: {session['visits']}"
+
+
+data = [1, 2, 3, 4]
+
+
+@app.route("/session")
+def session_data():
+    session.permanent = True
+    if "data" not in session:
+        session["data"] = data
+    else:
+        session["data"][1] += 1
+        session.modified = True
+    return f"<p>session['data']: {session['data']}"
 
 
 @app.route("/add_post", methods=["POST", "GET"])
