@@ -20,7 +20,6 @@ SECRET_KEY = "b1670b8fc8f5c511a53e5c4363f733f9419802e2"
 
 app = Flask(__name__)
 app.config.from_object(__name__)
-app.permanent_session_lifetime = datetime.timedelta(days=10)
 
 app.config.update(dict(DATABASE=os.path.join(app.root_path, "data.db")))
 
@@ -51,43 +50,28 @@ def close_db(error):
         g.link_db.close()
 
 
-# @app.route("/")
-# def index():
-#     db = get_db()
-#     dbase = FDataBase(db)
-#     return render_template(
-#         "index.html", menu=dbase.getMenu(), posts=dbase.getPostsAnonce()
-#     )
+dbase = None
+
+
+@app.before_request
+def before_request():
+    """Установление соединения с БД перед выполнением запроса"""
+    global dbase
+    db = get_db()
+    dbase = FDataBase(db)
 
 
 @app.route("/")
 def index():
-    if "visits" in session:
-        session["visits"] = session.get("visits") + 1
-    else:
-        session["visits"] = 1
-    return f"<h1>Main Page</h1><p>Число просмотров: {session['visits']}"
-
-
-data = [1, 2, 3, 4]
-
-
-@app.route("/session")
-def session_data():
-    session.permanent = True
-    if "data" not in session:
-        session["data"] = data
-    else:
-        session["data"][1] += 1
-        session.modified = True
-    return f"<p>session['data']: {session['data']}"
+    db = get_db()
+    dbase = FDataBase(db)
+    return render_template(
+        "index.html", menu=dbase.getMenu(), posts=dbase.getPostsAnonce()
+    )
 
 
 @app.route("/add_post", methods=["POST", "GET"])
 def addPost():
-    db = get_db()
-    dbase = FDataBase(db)
-
     if request.method == "POST":
         if len(request.form["name"]) > 4 and len(request.form["post"]) > 10:
             res = dbase.addPost(
@@ -106,8 +90,6 @@ def addPost():
 
 @app.route("/post/<alias>")
 def showPost(alias):
-    db = get_db()
-    dbase = FDataBase(db)
     title, post = dbase.getPost(alias)
     if not title:
         abort(404)
