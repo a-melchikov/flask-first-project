@@ -36,7 +36,7 @@ class FDataBase:
             text = re.sub(
                 r"(?P<tag><img\s+[^>]*src=)(?P<quote>[\"'])(?P<url>.+?)(?P=quote)>",
                 "\\g<tag>" + base + "/\\g<url>>",
-                text
+                text,
             )
 
             tm = math.floor(time.time())
@@ -74,3 +74,22 @@ class FDataBase:
             print("Ошибка получения статьи из БД " + str(e))
 
         return []
+
+    def addUser(self, name, email, hpsw):
+        try:
+            self.__cur.execute(
+                f"SELECT COUNT() as 'count' FROM users WHERE email LIKE '{email}'"
+            )
+            res = self.__cur.fetchone()
+            if res["count"] > 0:
+                print("Пользователь с таким email уже существует")
+                return False
+            tm = math.floor(time.time())
+            self.__cur.execute(
+                "INSERT INTO users VALUES(NULL, ?, ?, ?, ?)", (name, email, hpsw, tm)
+            )
+            self.__db.commit()
+        except sqlite3.Error as e:
+            print("Ошибка добавления пользователя в БД " + str(e))
+            return False
+        return True

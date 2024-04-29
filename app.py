@@ -6,12 +6,13 @@ from flask import (
     abort,
     flash,
     g,
-    make_response,
+    redirect,
     render_template,
     request,
-    session,
+    url_for,
 )
 from FDataBase import FDataBase
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Конфигурация
 DATABASE = "/home/andrey/code/flask-projects/flask-first-project/data.db"
@@ -99,20 +100,29 @@ def showPost(alias):
 
 @app.route("/login")
 def login():
-    log = ""
-    if request.cookies.get("logged"):
-        log = request.cookies.get("logged")
-
-    res = make_response(f"<h1>Форма авторизации</h1><p>logged: {log}")
-    res.set_cookie("logged", "yes", 30 * 24 * 3600)
-    return res
+    return render_template("login.html", menu=dbase.getMenu(), title="Авторизация")
 
 
-@app.route("/logout")
-def logout():
-    res = make_response("<p>Вы больше не авторизованы!</p>")
-    res.set_cookie("logged", "", 0)
-    return res
+@app.route("/register", methods=["POST", "GET"])
+def register():
+    if request.method == "POST":
+        if (
+            len(request.form["name"]) > 4
+            and len(request.form["email"]) > 4
+            and len(request.form["psw"]) > 4
+            and request.form["psw"] == request.form["psw2"]
+        ):
+            hash = generate_password_hash(request.form["psw"])
+            res = dbase.addUser(request.form["name"], request.form["email"], hash)
+            if res:
+                flash("Вы успешно зарегистрированы", "success")
+                return redirect(url_for("login"))
+            else:
+                flash("Ошибка при добавлении в БД", "error")
+        else:
+            flash("Неверно заполнены поля", "error")
+
+    return render_template("register.html", menu=dbase.getMenu(), title="Регистрация")
 
 
 if __name__ == "__main__":
