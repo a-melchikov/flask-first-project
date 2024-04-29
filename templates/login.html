@@ -2,7 +2,7 @@
 {% block content %}
     {{ super() }}
     {% for cat, msg in get_flashed_messages(True) %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
-    <form action="/login" method="post" class="form-contact">
+    <form action="" method="post" class="form-contact">
         <p>
             <label>Email:</label>
         </p>
