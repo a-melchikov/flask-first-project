@@ -3,24 +3,20 @@
     {{ super() }}
     {% for cat, msg in get_flashed_messages(True) %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
     <form action="/register" method="post" class="form-contact">
-        <p>
-            <label>Имя:</label>
-        </p>
-        <input type="text" name="name" value="" requied />
-        <p>
-            <label>Email:</label>
-        </p>
-        <input type="text" name="email" value="" requied />
-        <p>
-            <label>Пароль:</label>
-        </p>
-        <input type="password" name="psw" value="" requied />
-        <p>
-            <label>Повтор пароля:</label>
-        </p>
-        <input type="password" name="psw2" value="" requied />
-        <p>
-            <input type="submit" value="Регистрация" />
-        </p>
+        {{ form.hidden_tag() }}
+        {% for field in form if field.name not in ['csrf_token', 'submit'] -%}
+            <p>
+                {{ field.label() }}
+                {% if field.errors %}
+                    {{ field(class="invalid") }}
+                    <span class="invalid-feedback">
+                        {% for e in field.errors %}{{ e }}{% endfor %}
+                    </span>
+                {% else %}
+                    {{ field() }}
+                {% endif %}
+            </p>
+        {% endfor %}
+        <p>{{ form.submit() }}</p>
     </form>
 {% endblock content %}

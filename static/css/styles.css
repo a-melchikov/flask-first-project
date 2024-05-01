@@ -144,3 +144,11 @@ ul.profile-info {
 ul.profile-info li {
     margin-top: 10px;
 }
+
+.form-contact .invalid {
+    background: #FF9898;
+}
+
+.form-contact .invalid-feedback {
+    color: #CC0000;
+}
