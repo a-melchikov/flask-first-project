@@ -24,6 +24,7 @@ from UserLogin import UserLogin
 from FDataBase import FDataBase
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegisterForm
+from admin.admin import admin
 
 # Конфигурация
 DATABASE = "/home/andrey/code/flask-projects/flask-first-project/data.db"
@@ -34,6 +35,8 @@ MAX_CONTENT_LENGTH = 1024 * 1024
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.update(dict(DATABASE=os.path.join(app.root_path, "data.db")))
+
+app.register_blueprint(admin, url_prefix='/admin')
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
